@@ -1,0 +1,215 @@
+/* Layout: the page is built like the toy itself. Glossy plastic shells in each world's color hold cream plates,
+   butter-yellow buttons and phones. Sections stack in one column on phones and open to two columns from 900px. */
+:root {
+  --bg: #f3ece4; --ink: #3a2320; --ink-soft: #7a5a52; --plate: #fffaf0; --plate-edge: #e6d7c3;
+  --butter: #f6c445; --butter-deep: #c98d16; --butter-soft: #fbe6a6; --red: #d8443b; --chip-ink: #4a2a0a;
+  --ocean: #e0574a; --desert: #1fa7a8; --space: #2a2540; --rainforest: #2f8a4c; --arctic: #3f86b8; --savanna: #c08a12; --dinosaurs: #7d4f8a;
+  --ring-1: #ff549e; --ring-2: #ffdb2e; --ring-3: #61e07a; --ring-4: #ff8f1f; --ring-5: #a875ff;
+  --bezel: #1b1412; --on-shell: #fffaf0;
+  --display: "Fredoka", "Arial Rounded MT Bold", ui-rounded, system-ui, sans-serif;
+  --body: "Nunito Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1d1714; --ink: #f6e9dc; --ink-soft: #c2a89a; --plate: #2c231f; --plate-edge: #46382f;
+    --butter-soft: #4d3d14; --red: #ff7b6b; --space: #4a4370; --savanna: #d9a02a; --dinosaurs: #a87ab6; --bezel: #0b0807;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1d1714; --ink: #f6e9dc; --ink-soft: #c2a89a; --plate: #2c231f; --plate-edge: #46382f;
+  --butter-soft: #4d3d14; --red: #ff7b6b; --space: #4a4370; --savanna: #d9a02a; --dinosaurs: #a87ab6; --bezel: #0b0807;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+body {
+  margin: 0; background: var(--bg); color: var(--ink); font-family: var(--body); font-size: 17px; line-height: 1.55;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 0 48px;
+}
+img { max-width: 100%; display: block; }
+a { color: var(--red); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, summary:focus-visible { outline: 3px solid var(--butter); outline-offset: 3px; border-radius: 8px; }
+h1, h2, h3 { font-family: var(--display); font-weight: 600; line-height: 1.1; margin: 0; text-wrap: balance; }
+h2 { font-size: clamp(1.9rem, 4.2vw, 2.7rem); color: var(--red); }
+h3 { font-size: 1.3rem; }
+p { margin: 0; }
+.page { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.main { display: flex; flex-direction: column; gap: clamp(56px, 8vw, 96px); min-width: 0; }
+.stack { display: flex; flex-direction: column; gap: 24px; min-width: 0; scroll-margin-top: 20px; }
+.eyebrow { font: 700 0.78rem var(--body); letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+.section-head { display: flex; flex-direction: column; gap: 10px; max-width: 62ch; }
+.section-head p { color: var(--ink-soft); font-size: 1.08rem; }
+.todo { background: var(--butter-soft); color: var(--ink); border-radius: 5px; padding: 0 4px; font-weight: 700; }
+
+/* Top bar */
+.topbar { display: flex; align-items: center; justify-content: space-between; gap: 12px 24px; flex-wrap: wrap; padding-block: 18px 0; }
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--red); font: 600 1.6rem var(--display); }
+.brand img { width: 42px; height: 42px; border-radius: 10px; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.18); }
+.topnav { display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.topnav a { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 0.98rem; padding: 4px 0; }
+.topnav a:hover { color: var(--red); }
+
+/* The toy's plastic shell, with a screw in each corner. */
+.shell {
+  --shell: var(--ocean);
+  position: relative; border-radius: clamp(28px, 4vw, 44px); padding: clamp(18px, 3vw, 34px);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 38%), var(--shell);
+  box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), inset 0 -7px 0 rgba(0, 0, 0, 0.16), 0 14px 34px rgba(58, 35, 32, 0.18);
+}
+.screw {
+  position: absolute; width: 14px; height: 14px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #fff 0 18%, #d9d4cf 40%, #8f8780 100%);
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+.screw::after { content: ""; position: absolute; left: 2px; right: 2px; top: 6px; height: 2px; border-radius: 1px; background: rgba(60, 50, 45, 0.7); transform: rotate(var(--turn, 20deg)); }
+.screw.tl { top: 14px; left: 14px; --turn: 24deg; } .screw.tr { top: 14px; right: 14px; --turn: -18deg; }
+.screw.bl { bottom: 16px; left: 14px; --turn: 62deg; } .screw.br { bottom: 16px; right: 14px; --turn: 3deg; }
+.plate { background: var(--plate); border: 1.5px solid var(--plate-edge); border-radius: 26px; box-shadow: 0 3px 0 rgba(0, 0, 0, 0.12); }
+
+/* Butter buttons, like the game's. */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; text-decoration: none;
+  font: 600 1.08rem var(--display); color: var(--chip-ink); background: linear-gradient(180deg, #fff3b0 0%, var(--butter) 45%);
+  border-radius: 999px; padding: 12px 24px; box-shadow: inset 0 -4px 0 var(--butter-deep), 0 3px 8px rgba(0, 0, 0, 0.16);
+}
+.btn:active { transform: translateY(1px); box-shadow: inset 0 -2px 0 var(--butter-deep), 0 2px 5px rgba(0, 0, 0, 0.16); }
+.btn.big { font-size: 1.2rem; padding: 14px 28px; }
+@media (max-width: 420px) { .btn.big { font-size: 1.04rem; padding: 12px 18px; } }
+.btn small { font: 700 0.72rem var(--body); letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.75; }
+
+/* Phones: Apple's own iPhone 18 Pro picture (silver) with a screenshot of the game in it, made by
+   Tools/scripts/site/inframe.swift. Apple asks for these to be shown as they are: upright, never overlapped or cropped,
+   with no added shadows or reflections, and all at the same size. */
+.phone { margin: 0; }
+.phone img { width: 100%; height: auto; }
+
+/* Hero */
+.hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(20px, 4vw, 48px); align-items: center; overflow: hidden; }
+.hero-plate { position: relative; z-index: 2; padding: clamp(22px, 3.4vw, 40px); display: flex; flex-direction: column; gap: 18px; }
+.hero h1 { font-size: clamp(2.5rem, 6vw, 4rem); color: var(--red); letter-spacing: -0.01em; }
+.hero .lede { font-size: 1.15rem; max-width: 46ch; }
+.cta { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; }
+.cta .note { color: var(--ink-soft); font-size: 0.95rem; }
+.promises { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.promises li { font: 700 0.85rem var(--body); color: var(--ink); background: var(--butter-soft); border-radius: 999px; padding: 4px 12px; }
+/* One big phone whose screen takes turns showing three worlds. All three pictures are the same iPhone in the same spot,
+   stacked, so the phone itself never moves (as Apple asks for its iPhone pictures): only the game on its screen changes.
+   The Ocean sits underneath, always showing; the Rain Forest and then the Dinosaurs fade in over it, and the Dinosaurs
+   fade back out to the Ocean. Each world shows for 3.5 s, with a 1 s fade. */
+.hero-phones { position: relative; z-index: 2; display: grid; justify-items: center; padding-block: 12px; }
+.hero-phones .phone { grid-area: 1 / 1; width: min(100%, 290px); }     /* about as tall as the text box beside it */
+.hero-phones .second, .hero-phones .third { opacity: 0; animation: 13.5s ease-in-out infinite; }
+.hero-phones .second { animation-name: phone-second; }
+.hero-phones .third { animation-name: phone-third; }
+@keyframes phone-second { 0%, 25.9% { opacity: 0; } 33.3%, 66.6% { opacity: 1; } 66.7%, 100% { opacity: 0; } }
+@keyframes phone-third { 0%, 59.3% { opacity: 0; } 66.7%, 92.6% { opacity: 1; } 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .hero-phones .second, .hero-phones .third { animation: none; } }
+
+@media (max-width: 899px) {
+  .hero { grid-template-columns: minmax(0, 1fr); }
+  .hero-phones { max-width: 560px; margin-inline: auto; width: 100%; }
+  .hero-phones .phone { width: min(100%, 250px); }
+}
+
+/* How to play */
+.steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; counter-reset: step; }
+.step { padding: 22px; display: flex; flex-direction: column; gap: 10px; counter-increment: step; }
+.step .art { height: 150px; display: grid; place-items: center; border-radius: 18px; background: linear-gradient(180deg, #bfe3f2, #4f9fc6); position: relative; overflow: hidden; }
+.step h3::before { content: counter(step) ". "; color: var(--red); }
+.step p { color: var(--ink-soft); }
+.step .art svg { width: 70%; height: 80%; }
+.step .art .dolphin { height: 120px; width: auto; position: relative; z-index: 1; }
+/* The ring round the dolphin's nose, resting where the nose meets the head: its far half behind the dolphin, its near half in front. */
+.step .art .hooked { position: absolute; left: 50%; top: 32%; width: 32px; height: 17.3px; transform: translate(-50%, -50%) rotate(-8deg); color: var(--ring-1); }
+.step .art .hooked.front { z-index: 2; }
+
+/* Worlds */
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+.tab {
+  border: 0; cursor: pointer; border-radius: 14px; padding: 9px 16px; color: #fff; font: 600 1.05rem var(--display); background: var(--c);
+  opacity: 0.62; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18);
+}
+.tab:hover { opacity: 0.85; }
+.tab[aria-selected="true"] { opacity: 1; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18), 0 0 0 3px var(--butter); }
+.world { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: clamp(16px, 3vw, 32px); align-items: start; }
+.world .phone { max-width: 300px; width: 100%; margin-inline: auto; }
+.world-plate { padding: clamp(18px, 3vw, 30px); display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.world-plate h3 { font-size: clamp(1.8rem, 3.6vw, 2.4rem); color: var(--c); }
+.world-plate .welcome { font-size: 1.1rem; }
+.world-plate .count { font: 700 0.8rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-soft); }
+.creatures { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .creatures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.creature { background: color-mix(in srgb, var(--c) 9%, var(--plate)); border-radius: 16px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+.creature img { height: 66px; width: auto; max-width: 80px; object-fit: contain; }
+.creature b { font: 600 0.92rem var(--display); line-height: 1.15; }
+.creature span { font-size: 0.74rem; color: var(--ink-soft); line-height: 1.2; }
+@media (max-width: 760px) { .world { grid-template-columns: minmax(0, 1fr); } .world .phone { max-width: 240px; } }
+
+/* Fun facts */
+.fact { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 18px 24px; align-items: center; padding: clamp(20px, 3vw, 32px); }
+.fact .who { width: 120px; height: 120px; display: grid; place-items: center; border-radius: 28px; background: color-mix(in srgb, var(--c, var(--ocean)) 14%, var(--plate)); }
+.fact .who img { max-height: 96px; max-width: 96px; width: auto; object-fit: contain; }
+.fact .text { display: flex; flex-direction: column; gap: 10px; align-self: stretch; }
+/* Invisible copies of the longest tags and facts share each line's spot, so the card stays one size as the facts change. */
+.fact .steady { display: grid; }
+.fact .steady > * { grid-area: 1 / 1; }
+.fact .room { visibility: hidden; }
+.fact .tag { font: 700 0.78rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--c, var(--ocean)); }
+.fact blockquote { margin: 0; font: 500 clamp(1.3rem, 2.6vw, 1.75rem) / 1.3 var(--display); text-wrap: pretty; }
+.fact .more { align-self: flex-start; margin-top: auto; }
+@media (max-width: 560px) { .fact { grid-template-columns: minmax(0, 1fr); } }
+
+/* Families */
+.families { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+.pledges { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; }
+.pledge { padding: 18px 20px; display: flex; flex-direction: column; gap: 6px; }
+.pledge h3 { font-size: 1.15rem; display: flex; align-items: center; gap: 10px; }
+.pledge h3 svg { width: 26px; height: 26px; flex: none; }
+.pledge p { color: var(--ink-soft); font-size: 0.98rem; }
+.prices { --shell: var(--butter-deep); }
+.prices .plate { padding: 22px; display: flex; flex-direction: column; gap: 14px; }
+.prices h3 { font-size: 1.4rem; }
+.price-list { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px 16px; align-items: baseline; }
+.price-list dt { font: 600 1.35rem var(--display); color: var(--red); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.price-list dd { margin: 0; }
+.price-list dd small { display: block; color: var(--ink-soft); font-size: 0.86rem; }
+.prices .fine { color: var(--ink-soft); font-size: 0.86rem; }
+@media (max-width: 899px) { .families { grid-template-columns: minmax(0, 1fr); } }
+
+/* Pages: Help and Privacy */
+.page-head { display: flex; flex-direction: column; gap: 6px; padding-block: clamp(26px, 4vw, 40px); }
+.page-head .plate { padding: clamp(20px, 3vw, 30px); display: flex; flex-direction: column; gap: 8px; }
+.page-head h1 { font-size: clamp(2.2rem, 5vw, 3.2rem); color: var(--red); }
+.page-head p { color: var(--ink-soft); }
+.doc { max-width: 720px; display: flex; flex-direction: column; gap: 26px; }
+.doc section { display: flex; flex-direction: column; gap: 8px; }
+.doc h2 { font-size: 1.45rem; }
+.doc p { max-width: 65ch; }
+.faq { display: flex; flex-direction: column; gap: 12px; max-width: 760px; }
+.faq details { padding: 4px 20px; }
+.faq summary { cursor: pointer; font: 600 1.2rem var(--display); padding-block: 14px; list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: "+"; font: 600 1.5rem var(--display); color: var(--red); flex: none; }
+.faq details[open] summary::after { content: "–"; }
+.faq details p { padding-bottom: 16px; color: var(--ink-soft); max-width: 65ch; }
+.contact { padding: 22px; display: flex; flex-direction: column; gap: 8px; max-width: 760px; }
+.help-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 320px); gap: 32px; align-items: start; }
+.help-main { display: flex; flex-direction: column; gap: 24px; min-width: 0; }
+.help-aside { position: sticky; top: 20px; }
+.screen-card { margin: 0; display: flex; flex-direction: column; gap: 12px; }
+.screen-card img { width: 100%; height: auto; border-radius: 24px; border: 1.5px solid var(--plate-edge); box-shadow: 0 10px 26px rgba(0, 0, 0, 0.16); }
+.screen-card figcaption { color: var(--ink-soft); font-size: 0.92rem; }
+@media (max-width: 860px) { .help-grid { grid-template-columns: minmax(0, 1fr); } .help-aside { position: static; max-width: 360px; } }
+
+/* Footer */
+.footer { margin-top: 36px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px 24px; padding-top: 28px; border-top: 2px dashed var(--plate-edge); color: var(--ink-soft); font-size: 0.92rem; }
+.footer nav { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.footer a { color: var(--ink-soft); font-weight: 700; }
+.footer .brand { font-size: 1.2rem; }
+.footer .brand img { width: 30px; height: 30px; border-radius: 7px; }
+.footer .credit { flex-basis: 100%; font-size: 0.78rem; }
