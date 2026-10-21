@@ -12,12 +12,16 @@
     return node;
   }
   function colorOf(world) { return "var(--" + world.key + ")"; }
+  var still = window.matchMedia("(prefers-reduced-motion: reduce)");
 
   // Worlds: one tab per world, and a panel with its screenshot, welcome line and ten creatures.
   var tabs = document.getElementById("world-tabs"), panel = document.getElementById("world-panel");
   if (tabs && panel) {
-    function show(index, focus) {
-      var w = worlds[index];
+    // A new world: the panel's colour blends across while the old world fades and drops away, then the new one rises
+    // in (its phone first, then its words, then its creatures; see .entering in site.css). Instant with reduced motion.
+    var turn = 0;
+    function show(index, focus, animate) {
+      var w = worlds[index], mine = ++turn;
       Array.prototype.forEach.call(tabs.children, function (t, i) {
         t.setAttribute("aria-selected", i === index ? "true" : "false");
         t.tabIndex = i === index ? 0 : -1;
@@ -44,16 +48,34 @@
         grid
       ]);
       var screws = ["tl", "tr", "bl", "br"].map(function (c) { return el("span", { class: "screw " + c, "aria-hidden": "true" }); });
-      panel.replaceChildren.apply(panel, screws.concat([el("div", { class: "world" }, [figure, plate])]));
+      var world = el("div", { class: "world" }, [figure, plate]);
+      if (!animate || still.matches) { panel.classList.remove("leaving"); panel.replaceChildren.apply(panel, screws.concat([world])); return; }
+      panel.classList.add("leaving");
+      setTimeout(function () {
+        if (mine !== turn) return;     // (another tab was picked meanwhile)
+        world.classList.add("entering");
+        panel.replaceChildren.apply(panel, screws.concat([world]));
+        panel.classList.remove("leaving");
+        var phone = figure.querySelector("img");
+        phone.loading = "eager";
+        // (Waits for the phone picture, but not for long: it may be off screen, or the network slow.)
+        var ready = Promise.race([phone.decode ? phone.decode().catch(function () {}) : Promise.resolve(),
+                                  new Promise(function (done) { setTimeout(done, 300); })]);
+        ready.then(function () {
+          if (mine !== turn) return;
+          void world.offsetWidth;     // (so the browser draws the hidden state before it eases out of it)
+          world.classList.remove("entering");
+        });
+      }, 180);
     }
     worlds.forEach(function (w, i) {
       var tab = el("button", { class: "tab", role: "tab", id: "tab-" + w.key, "aria-controls": "world-panel", type: "button", text: w.name });
       tab.style.setProperty("--c", colorOf(w));
-      tab.addEventListener("click", function () { show(i, false); });
+      tab.addEventListener("click", function () { if (tab.getAttribute("aria-selected") !== "true") show(i, false, true); });
       tab.addEventListener("keydown", function (e) {
         if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
           e.preventDefault();
-          show((i + (e.key === "ArrowRight" ? 1 : worlds.length - 1)) % worlds.length, true);
+          show((i + (e.key === "ArrowRight" ? 1 : worlds.length - 1)) % worlds.length, true, true);
         }
       });
       tabs.appendChild(tab);
@@ -89,7 +111,7 @@
     }
     // The old fact fades and drops away, then the new one rises in once its picture has loaded (instantly with
     // reduced motion).
-    var still = window.matchMedia("(prefers-reduced-motion: reduce)"), swapping = false;
+    var swapping = false;
     fact.querySelector(".more").addEventListener("click", function () {
       if (swapping) return;
       var next = current;

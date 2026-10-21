@@ -174,9 +174,20 @@ p { margin: 0; }
 @property --c { syntax: "<color>"; inherits: true; initial-value: #e0574a; }     /* (the Ocean red, as the fallbacks) */
 .fact { transition: --c 0.4s ease; }
 .fact .who img, .fact .tag:not(.room), .fact blockquote:not(.room) { transition: opacity 0.18s ease, transform 0.22s ease; }
+.fact .tag:not(.room), .fact blockquote:not(.room) { transition-delay: 0.07s; }     /* (the picture rises in a beat ahead of the words) */
 .fact.leaving .who img { opacity: 0; transform: scale(0.85) translateY(6px); }
-.fact.leaving .tag:not(.room), .fact.leaving blockquote:not(.room) { opacity: 0; transform: translateY(8px); }
+.fact.leaving .tag:not(.room), .fact.leaving blockquote:not(.room) { opacity: 0; transform: translateY(8px); transition-delay: 0s; }
 @media (prefers-reduced-motion: reduce) { .fact, .fact .who img, .fact .tag, .fact blockquote { transition: none; } }
+/* Changing worlds (site.js): the same, for the world panel. Its colour blends across; the old world fades and drops
+   away; the new one rises in, its phone first, then its words, then its creatures. */
+@property --shell { syntax: "<color>"; inherits: true; initial-value: #e0574a; }
+#world-panel { transition: --shell 0.4s ease, --c 0.4s ease; }
+#world-panel .phone, #world-panel .world-plate > * { transition: opacity 0.2s ease, transform 0.26s ease; }
+#world-panel .world-plate > * { transition-delay: 0.08s; }
+#world-panel .world-plate > .creatures { transition-delay: 0.16s; }
+#world-panel.leaving .phone, #world-panel.leaving .world-plate > *,
+#world-panel .entering .phone, #world-panel .entering .world-plate > * { opacity: 0; transform: translateY(10px); transition-delay: 0s; }
+@media (prefers-reduced-motion: reduce) { #world-panel, #world-panel .phone, #world-panel .world-plate > * { transition: none; } }
 @media (max-width: 560px) { .fact { grid-template-columns: minmax(0, 1fr); } }
 
 /* Families */
