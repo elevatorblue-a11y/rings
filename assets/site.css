@@ -170,6 +170,13 @@ p { margin: 0; }
 .fact .tag { font: 700 0.78rem var(--body); letter-spacing: 0.12em; text-transform: uppercase; color: var(--c, var(--ocean)); }
 .fact blockquote { margin: 0; font: 500 clamp(1.3rem, 2.6vw, 1.75rem) / 1.3 var(--display); text-wrap: pretty; }
 .fact .more { align-self: flex-start; margin-top: auto; }
+/* Changing facts: the picture, tag and fact fade and drop away, then rise back in; the world colour blends across. */
+@property --c { syntax: "<color>"; inherits: true; initial-value: #e0574a; }     /* (the Ocean red, as the fallbacks) */
+.fact { transition: --c 0.4s ease; }
+.fact .who img, .fact .tag:not(.room), .fact blockquote:not(.room) { transition: opacity 0.18s ease, transform 0.22s ease; }
+.fact.leaving .who img { opacity: 0; transform: scale(0.85) translateY(6px); }
+.fact.leaving .tag:not(.room), .fact.leaving blockquote:not(.room) { opacity: 0; transform: translateY(8px); }
+@media (prefers-reduced-motion: reduce) { .fact, .fact .who img, .fact .tag, .fact blockquote { transition: none; } }
 @media (max-width: 560px) { .fact { grid-template-columns: minmax(0, 1fr); } }
 
 /* Families */

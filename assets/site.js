@@ -77,18 +77,30 @@
     var steady = fact.querySelectorAll(".steady");
     room(steady[0], all.map(tagOf), "span");
     room(steady[1], all.map(function (x) { return x.f; }), "blockquote");
+    var img = fact.querySelector(".who img");
+    // Shows the current fact; the promise settles once its creature's picture is ready to draw.
     function render() {
       var x = all[current];
       fact.style.setProperty("--c", colorOf(x.w));
-      fact.querySelector(".who img").src = "assets/img/creatures/L" + x.l.n + ".png";
+      img.src = "assets/img/creatures/L" + x.l.n + ".png";
       fact.querySelector(".tag").textContent = tagOf(x);
       fact.querySelector("blockquote").textContent = x.f;
+      return (img.decode ? img.decode() : Promise.resolve()).catch(function () {});
     }
+    // The old fact fades and drops away, then the new one rises in once its picture has loaded (instantly with
+    // reduced motion).
+    var still = window.matchMedia("(prefers-reduced-motion: reduce)"), swapping = false;
     fact.querySelector(".more").addEventListener("click", function () {
+      if (swapping) return;
       var next = current;
       while (all.length > 1 && (next === current || all[next].l.n === all[current].l.n)) next = Math.floor(Math.random() * all.length);
       current = next;
-      render();
+      if (still.matches) { render(); return; }
+      swapping = true;
+      fact.classList.add("leaving");
+      setTimeout(function () {
+        render().then(function () { fact.classList.remove("leaving"); swapping = false; });
+      }, 180);
     });
     render();
   }
