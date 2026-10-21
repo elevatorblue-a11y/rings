@@ -109,6 +109,14 @@ p { margin: 0; }
 @keyframes phone-second { 0%, 25.9% { opacity: 0; } 33.3%, 66.6% { opacity: 1; } 66.7%, 100% { opacity: 0; } }
 @keyframes phone-third { 0%, 59.3% { opacity: 0; } 66.7%, 92.6% { opacity: 1; } 100% { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .hero-phones .second, .hero-phones .third { animation: none; } }
+/* Each phone plays a gameplay loop in its screen, on top of its still picture (which shows until the video starts, and
+   stays when motion is turned down). The box is the bezel's screen opening: 1206 x 2622 of the 1350 x 2760 frame. */
+.phone.live { position: relative; }
+.phone.live video {
+  position: absolute; left: 5.3333%; top: 2.5%; width: 89.3333%; height: 95%;
+  border-radius: 16.8% / 7.74%; object-fit: cover; pointer-events: none;
+}
+@media (prefers-reduced-motion: reduce) { .phone.live video { display: none; } }
 
 @media (max-width: 899px) {
   .hero { grid-template-columns: minmax(0, 1fr); }
