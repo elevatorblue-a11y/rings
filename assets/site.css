@@ -154,6 +154,18 @@ p { margin: 0; }
 @media (max-width: 560px) { .creatures { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .creature { background: color-mix(in srgb, var(--c) 9%, var(--plate)); border-radius: 16px; padding: 10px 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
 .creature img { height: 66px; width: auto; max-width: 80px; object-fit: contain; }
+/* A creature's picture (site.js pic()), idling gently: animals bob, plants sway from their base, space machines hover,
+   each at its own pace (--dur, --delay) so they never move together. Its eyes-shut copy sits on top, shown for a blink. */
+.pic { display: grid; place-items: center; animation: bob var(--dur, 4.5s) ease-in-out var(--delay, 0s) infinite; }
+.pic > img { grid-area: 1 / 1; }
+.pic > .shut { opacity: 0; }
+.pic.shut > .shut { opacity: 1; }
+.pic.sway { animation-name: sway; transform-origin: 50% 100%; }
+.pic.hover { animation-name: hover; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2px); } }
+@keyframes sway { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+@keyframes hover { 0%, 100% { transform: translateY(0) rotate(-0.6deg); } 50% { transform: translateY(-3px) rotate(0.6deg); } }
+@media (prefers-reduced-motion: reduce) { .pic { animation: none; } }
 .creature b { font: 600 0.92rem var(--display); line-height: 1.15; }
 .creature span { font-size: 0.74rem; color: var(--ink-soft); line-height: 1.2; }
 @media (max-width: 760px) { .world { grid-template-columns: minmax(0, 1fr); } .world .phone { max-width: 240px; } }

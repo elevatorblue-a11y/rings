@@ -14,6 +14,36 @@
   function colorOf(world) { return "var(--" + world.key + ")"; }
   var still = window.matchMedia("(prefers-reduced-motion: reduce)");
 
+  // A creature's picture, idling gently (see .pic in site.css): plants sway from their base, space machines hover and
+  // everyone else bobs, each at its own pace. Those with eyelids in the game also blink now and then, with an eyes-shut
+  // copy of the picture on top (creatures/blink/L<n>.png, painted by the game project's Tools/scripts/site/make_blinks.sh).
+  var BLINKS = [1, 2, 3, 4, 5, 6, 7, 8, 10, 12, 13, 14, 15, 16, 17, 19, 20, 26, 28, 34, 36, 37, 38, 39, 40, 41, 43, 45, 46, 47, 49,
+                50, 51, 52, 53, 54, 67, 68, 69, 70, 71, 72, 73, 75, 76, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87];
+  var SWAY = [9, 11, 24, 27, 35, 48, 74], HOVER = [21, 22, 23, 25, 29, 30];
+  function pic(n) {
+    var kind = SWAY.indexOf(n) >= 0 ? " sway" : HOVER.indexOf(n) >= 0 ? " hover" : "";
+    var blinks = BLINKS.indexOf(n) >= 0;
+    var box = el("div", { class: "pic" + kind + (blinks ? " blinks" : "") }, [el("img", { src: "assets/img/creatures/L" + n + ".png", alt: "", loading: "lazy" })]);
+    if (blinks) box.appendChild(el("img", { class: "shut", src: "assets/img/creatures/blink/L" + n + ".png", alt: "", loading: "lazy", "aria-hidden": "true" }));
+    box.style.setProperty("--dur", (3.6 + Math.random() * 2).toFixed(2) + "s");
+    box.style.setProperty("--delay", (-Math.random() * 5).toFixed(2) + "s");
+    return box;
+  }
+  // Blinks: every few seconds, at random, each creature shows its eyes-shut picture for a moment (now and then twice),
+  // as the game's creatures do.
+  function blink(p) { p.classList.add("shut"); setTimeout(function () { p.classList.remove("shut"); }, 140); }
+  if (!still.matches) setInterval(function () {
+    var now = Date.now();
+    document.querySelectorAll(".pic.blinks").forEach(function (p) {
+      var due = Number(p.dataset.due) || 0;
+      if (!due) { p.dataset.due = now + 1500 + Math.random() * 7000; return; }
+      if (now < due) return;
+      p.dataset.due = now + 3500 + Math.random() * 6000;
+      blink(p);
+      if (Math.random() < 0.2) setTimeout(function () { blink(p); }, 280);
+    });
+  }, 200);
+
   // Worlds: one tab per world, and a panel with its screenshot, welcome line and ten creatures.
   var tabs = document.getElementById("world-tabs"), panel = document.getElementById("world-panel");
   if (tabs && panel) {
@@ -32,7 +62,7 @@
       panel.setAttribute("aria-labelledby", "tab-" + w.key);
       var grid = el("div", { class: "creatures" }, w.levels.map(function (l) {
         return el("div", { class: "creature" }, [
-          el("img", { src: "assets/img/creatures/L" + l.n + ".png", alt: "", loading: "lazy" }),
+          pic(l.n),
           el("b", { text: l.creature }),
           el("span", { text: l.name })
         ]);
@@ -99,15 +129,19 @@
     var steady = fact.querySelectorAll(".steady");
     room(steady[0], all.map(tagOf), "span");
     room(steady[1], all.map(function (x) { return x.f; }), "blockquote");
-    var img = fact.querySelector(".who img");
+    var who = fact.querySelector(".who");
     // Shows the current fact; the promise settles once its creature's picture is ready to draw.
     function render() {
       var x = all[current];
       fact.style.setProperty("--c", colorOf(x.w));
-      img.src = "assets/img/creatures/L" + x.l.n + ".png";
+      var p = pic(x.l.n), img = p.querySelector("img");
+      img.loading = "eager";
+      who.replaceChildren(p);
       fact.querySelector(".tag").textContent = tagOf(x);
       fact.querySelector("blockquote").textContent = x.f;
-      return (img.decode ? img.decode() : Promise.resolve()).catch(function () {});
+      // (Waits for the picture, but not for long: it may be off screen, or the network slow.)
+      return Promise.race([img.decode ? img.decode().catch(function () {}) : Promise.resolve(),
+                           new Promise(function (done) { setTimeout(done, 300); })]);
     }
     // The old fact fades and drops away, then the new one rises in once its picture has loaded (instantly with
     // reduced motion).

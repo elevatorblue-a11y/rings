@@ -4,7 +4,7 @@ window.RINGS_WORLDS = [
   "key": "ocean",
   "name": "Ocean",
   "title": "The Ocean",
-  "welcome": "Dive in! Pump bubbles to float the rings onto ten friendly sea creatures.",
+  "welcome": "Dive in! Send bubbles up to float the rings onto ten friendly sea creatures.",
   "levels": [
    {
     "n": 1,
